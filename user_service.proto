@@ -1,0 +1,22 @@
+//protoc --proto_path=. --proto_path=$env:GOPATH\pkg\mod\github.com\go-kratos\kratos\v2@v2.0.5\api --proto_path=$env:GOPATH\pkg\mod\github.com\grpc-ecosystem\grpc-gateway\v2@v2.6.0 --proto_path=$env:GOPATH\pkg\mod\github.com\go-kratos\kratos\v2@v2.0.5\third_party  --go_out=. --go-grpc_out=. --go-http_out=. --go-websocket_out=. --go-errors_out=.  ./pkg/proto/user/*.proto
+
+
+syntax = "proto3";
+
+package user;
+option  go_package = "pkg/proto/user/pb";//设置go包的可选项
+
+import "google/api/annotations.proto";
+
+service UserService{
+  //注册用户
+  rpc UserRegister(UserRegisterReq) returns (UserRegisterResp){
+    option (google.api.http) = {
+      post: "/user/register"
+      body: "*"
+    };
+  }
+}
+
+message UserRegisterReq{}
+message UserRegisterResp{}

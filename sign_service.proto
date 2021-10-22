@@ -1,0 +1,282 @@
+//protoc --proto_path=. --proto_path=$env:GOPATH\pkg\mod\github.com\go-kratos\kratos\v2@v2.0.5\api --proto_path=$env:GOPATH\pkg\mod\github.com\grpc-ecosystem\grpc-gateway\v2@v2.6.0 --proto_path=$env:GOPATH\pkg\mod\github.com\go-kratos\kratos\v2@v2.0.5\third_party  --go_out=. --go-grpc_out=. --go-http_out=. --go-errors_out=.  ./pkg/proto/sign/service/*.proto
+//protoc-go-inject-tag -input="*.pb.go"
+syntax = "proto3";
+
+package pb;
+option  go_package = "pkg/proto/sign/service/gopb";//设置go包的可选项
+
+import "google/api/annotations.proto";
+
+service SignService{
+    //新增开立
+    rpc OrgAccountAdd(OrgAccountAddReq) returns (OrgAccountAddResp){
+      option (google.api.http) = {
+        post: "/sign/org/add"
+        body: "*"
+      };
+    }
+    rpc UserAccountAdd(UserAccountAddReq) returns (UserAccountAddResp){
+      option (google.api.http) = {
+        post: "/sign/user/add"
+        body: "*"
+      };
+    }
+
+    rpc TemplateCreate(CreateByTemplateReq) returns (CreateByTemplateResp){
+      option (google.api.http) = {
+        post: "/sign/template/create"
+        body: "*"
+      };
+    }
+    rpc TemplateGet(TemplateGetReq) returns (TemplateGetResp){
+      option (google.api.http) = {
+        get: "/sign/template/get/{TemplateID}"
+      };
+    }
+    rpc FlowOneStepCreate(FlowOneStepCreateReq) returns (FlowOneStepCreateResp){
+      option (google.api.http) = {
+        post: "/sign/signflows/create"
+        body: "*"
+      };
+    }
+    //开立合同
+    rpc VoucherIssue(VoucherIssueReq) returns (VoucherIssueResp){
+      option (google.api.http) = {
+        get: "/sign/voucher/issue"
+      };
+    }
+    //签收完成后通知
+    rpc Notice(NoticeReq) returns (NoticeResp){
+      option (google.api.http) = {
+        post: "/sign/signflows/notice"
+        body: "*"
+      };
+    }
+}
+
+
+
+message NoticeResp{
+  string Code = 1;
+  string Msg = 2;
+}
+
+message NoticeReq{
+  // @inject_tag: json:"action,omitempty"
+  string action = 1;
+  // @inject_tag: json:"flowId,omitempty"
+  string flowId = 2;
+  // @inject_tag: json:"accountId,omitempty"
+  string accountId = 3;
+  // @inject_tag: json:"authorizedAccountId,omitempty"
+  string authorizedAccountId=4;
+  // @inject_tag: json:"signTime,omitempty"
+  string signTime =5;
+  // @inject_tag: json:"order,omitempty"
+  int32 order = 6;
+  // @inject_tag: json:"signResult,omitempty"
+  int32 signResult =7;
+  // @inject_tag: json:"thirdOrderNo,omitempty"
+  string thirdOrderNo =8;
+  // @inject_tag: json:"resultDescription,omitempty"
+  string resultDescription =9;
+  // @inject_tag: json:"timestamp,omitempty"
+  int64 timestamp =10;
+  // @inject_tag: json:"thirdPartyUserId,omitempty"
+  string thirdPartyUserId =11;
+}
+
+message VoucherIssueReq{
+ string Code = 1;//唯一ID
+ string VoucherCode = 2;//票号
+ string Receiver = 3;//接收人
+ string ContractCode =4;//合同号
+ double Amount =5;//合同金额
+ int64 DueAt = 6;//到期日 支付日
+ string Payer = 7; //支付人 名称 开立人默认为支付人
+}
+
+message VoucherIssueResp{
+  string FlowID = 1;
+}
+
+message FlowOneStepCreateReq{
+  //文档
+  message Doc{
+    // @inject_tag: json:"fileId,omitempty"
+    string FileId = 1;
+    // @inject_tag: json:"fileName,omitempty"
+    string FileName =2;
+   }
+   //附件
+   message Attachment{
+    // @inject_tag: json:"fileId,omitempty"
+    string FileId = 1;
+    // @inject_tag: json:"attachmentName,omitempty"
+    string AttachmentName =2;
+   }
+  message Info{
+    // @inject_tag: json:"autoArchive,omitempty"
+    bool  AutoArchive  =1;
+    // @inject_tag: json:"autoInitiate,omitempty"
+    bool  AutoInitiate  =2;
+    // @inject_tag: json:"businessScene,omitempty"
+    string  BusinessScene   =3;
+    // @inject_tag: json:"contractRemind,omitempty"
+    int64  ContractRemind  =4;
+    // @inject_tag: json:"contractValidity,omitempty"
+    int64  ContractValidity   =5;
+    // @inject_tag: json:"flowConfigInfo,omitempty"
+    FlowConfigInfo  FlowConfigInfo =6;
+    // @inject_tag: json:"initiatorAccountId,omitempty"
+    string  InitiatorAccountId  =7;
+    // @inject_tag: json:"initiatorAuthorizedAccountId,omitempty"
+    string  InitiatorAuthorizedAccountId   =8;
+    // @inject_tag: json:"remark,omitempty"
+    string  Remark  =9;
+    // @inject_tag: json:"signValidity,omitempty"
+    string  SignValidity  =10;
+    }
+    
+    message FlowConfigInfo {
+      // @inject_tag: json:"noticeDeveloperUrl,omitempty"
+      string  NoticeDeveloperUrl =1;
+      // @inject_tag: json:"noticeType,omitempty"
+      string  NoticeType   =2;
+      // @inject_tag: json:"redirectUrl,omitempty"
+      string  RedirectUrl  =3;
+      // @inject_tag: json:"signPlatform,omitempty"
+      string SignPlatform  =4;
+      // @inject_tag: json:"redirectDelayTime,omitempty"
+      int64 RedirectDelayTime  =5;
+      // @inject_tag: json:"personAvailableAuthTypes,omitempty"
+      repeated string PersonAvailableAuthTypes = 6;
+  }
+  message Signer{
+    // @inject_tag: json:"platformSign,omitempty"
+    bool  PlatformSign =1;
+    // @inject_tag: json:"signOrder,omitempty"
+    int64 SignOrder =2;
+    // @inject_tag: json:"signerAccount,omitempty"
+    SignerAccount SignerAccount=3;
+    // @inject_tag: json:"signfields,omitempty"
+    repeated Signfield Signfields =4;
+    // @inject_tag: json:"thirdOrderNo,omitempty"
+    string ThirdOrderNo=5;
+  }
+
+  message SignerAccount{
+    // @inject_tag: json:"signerAccountId,omitempty"
+    string SignerAccountId   =1;
+    // @inject_tag: json:"authorizedAccountId,omitempty"
+    string AuthorizedAccountId =2;
+    // @inject_tag: json:"willTypes,omitempty"    
+    repeated string WillTypes = 3;
+  }
+  
+  message Signfield {
+    // @inject_tag: json:"autoExecute,omitempty"
+    bool AutoExecute  =1;
+    // @inject_tag: json:"actorIndentityType,omitempty"
+    int32  ActorIndentityType    =2;
+    // @inject_tag: json:"fileId,omitempty"
+    string  FileId  =3;
+    // @inject_tag: json:"order,omitempty"
+    string  Order    =4;
+    // @inject_tag: json:"sealId,omitempty"
+    string  SealId   =5;
+    // @inject_tag: json:"sealType,omitempty"
+    string  SealType    =6;
+    // @inject_tag: json:"signType,omitempty"
+    int64   SignType  =7;
+    // @inject_tag: json:"posBean,omitempty"
+    Pos PosBean   =8;
+    // @inject_tag: json:"width,omitempty"
+    int64 Width =9;
+    // @inject_tag: json:"signDateBeanType,omitempty"
+    int64 SignDateBeanType =10;
+    // @inject_tag: json:"signDateBean,omitempty"
+    SignDateBean SignDateBean =11;
+    // @inject_tag: json:"authorizedAccountId,omitempty"
+    string  AuthorizedAccountId =12;
+    // @inject_tag: json:"signerAccountId,omitempty"
+    string  SignerAccountId =13;
+  }
+
+  message SignDateBean {
+    // @inject_tag: json:"fontSize,omitempty"
+    int64 FontSize =1;
+    // @inject_tag: json:"format,omitempty"
+    string Format  =2;
+    // @inject_tag: json:"posPage,omitempty"
+    int64 PosPage  =3;
+    // @inject_tag: json:"posX,omitempty"
+    float PosX =4;
+    // @inject_tag: json:"posY,omitempty"
+    float PosY =5;
+  }
+
+  message Pos  {
+    // @inject_tag: json:"posPage,omitempty"
+    string PosPage   =1;
+    // @inject_tag: json:"posX,omitempty"
+    float PosX   =2;
+    // @inject_tag: json:"posY,omitempty"
+    float PosY    =3;
+    // @inject_tag: json:"addSignTime,omitempty"
+    bool AddSignTime  =4;
+    // @inject_tag: json:"signTimeFormat,omitempty"
+    string SignTimeFormat  =5;
+  }
+    // @inject_tag: json:"docs,omitempty"
+    repeated Doc Docs = 1;
+    // @inject_tag: json:"attachments,omitempty"
+    repeated Attachment Attachments = 2;
+    // @inject_tag: json:"flowInfo,omitempty"
+    Info FlowInfo = 3;
+    // @inject_tag: json:"signers,omitempty"
+    repeated Signer Signers = 4;
+}
+message FlowOneStepCreateResp{
+  string flowID = 1;
+}
+
+message TemplateGetReq{
+  string TemplateID =1;
+}
+
+message TemplateGetResp{
+}
+
+message CreateByTemplateReq{
+  string Name =1;
+  string TemplateID =2;
+  map<string, string> SimpleFormFields = 3; 
+}
+
+message CreateByTemplateResp{
+  string DownloadUrl =1;
+  string FileId = 2;
+  string FileName = 3;
+}
+
+message UserAccountAddReq{
+  string UserId =1;
+	string Name   =2;
+	string Mobile =3;     
+  string Email  =4;      
+}
+
+message UserAccountAddResp{
+  string AccountId = 1;
+}
+
+message OrgAccountAddReq{
+      string TaxCode = 1;
+      string Name =2;
+      string CreatorCode = 3;
+}
+
+message OrgAccountAddResp{
+    string OrgID = 1;
+}
