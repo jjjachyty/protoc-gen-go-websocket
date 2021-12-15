@@ -1,4 +1,4 @@
-module protoc-gen-go-websocket
+module github.com/jjjachyty/protoc-gen-go-websocket
 
 go 1.16
 
